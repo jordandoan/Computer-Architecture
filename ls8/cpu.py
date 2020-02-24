@@ -1,7 +1,7 @@
 """CPU functionality."""
 
 import sys
-
+from dispatch import Dispatch
 class CPU:
     """Main CPU class."""
 
@@ -11,6 +11,7 @@ class CPU:
         self.register = [0] * 8
         self.register[-1] = 0xF4
         self.pc = 0
+        self.dispatch = Dispatch()
 
     def ram_read(self, memory):
         return self.ram[memory]
@@ -63,21 +64,27 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        HLT = 0b00000001
-        LDI = 0b10000010
-        PRN = 0b01000111
+        # HLT = 0b00000001
+        # LDI = 0b10000010
+        # PRN = 0b01000111
 
+        # while True:
+        #     command = self.ram_read(self.pc)
+        #
+        #     if command == HLT:
+        #         break
+        #     elif command == LDI:
+        #         reg_id = self.ram_read(self.pc + 1)
+        #         val = self.ram_read(self.pc + 2)
+        #         self.register[reg_id] = val
+        #         self.pc += 2
+        #     elif command == PRN:
+        #         print(self.register[self.ram_read(self.pc + 1)])
+        #         self.pc += 1
+        #     self.pc += 1
         while True:
             command = self.ram_read(self.pc)
-
-            if command == HLT:
+            halt = self.dispatch.run(command, self)
+            if halt:
                 break
-            elif command == LDI:
-                reg_id = self.ram_read(self.pc + 1)
-                val = self.ram_read(self.pc + 2)
-                self.register[reg_id] = val
-                self.pc += 2
-            elif command == PRN:
-                print(self.register[self.ram_read(self.pc + 1)])
-                self.pc += 1
             self.pc += 1
