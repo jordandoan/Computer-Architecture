@@ -2,7 +2,6 @@
 
 import sys
 
-
 class CPU:
     """Main CPU class."""
 
@@ -23,22 +22,16 @@ class CPU:
         """Load a program into memory."""
 
         address = 0
-
-        # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
-        ]
-
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        try:
+            path = sys.argv[1]
+        except:
+            path = 'examples/print8.ls8'
+        with open(path, 'r') as program:
+            for instruction in program:
+                if len(instruction) > 1:
+                    if instruction[0] != '#':
+                        self.ram[address] = int(instruction[0:8],2)
+                        address += 1
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -66,7 +59,6 @@ class CPU:
 
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
-
         print()
 
     def run(self):
@@ -74,14 +66,18 @@ class CPU:
         HLT = 0b00000001
         LDI = 0b10000010
         PRN = 0b01000111
+
         while True:
-            command = self.ram[self.pc]
+            command = self.ram_read(self.pc)
+
             if command == HLT:
                 break
             elif command == LDI:
-                self.register[self.ram[self.pc + 1]] = self.ram[self.pc+2]
+                reg_id = self.ram_read(self.pc + 1)
+                val = self.ram_read(self.pc + 2)
+                self.register[reg_id] = val
                 self.pc += 2
             elif command == PRN:
-                print(self.register[self.ram[self.pc + 1]])
+                print(self.register[self.ram_read(self.pc + 1)])
                 self.pc += 1
             self.pc += 1
