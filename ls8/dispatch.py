@@ -1,13 +1,14 @@
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
-
+MUL = 0b10100010
 class Dispatch():
     def __init__(self):
         self.dispatch = {
             HLT: self.halt,
             LDI: self.load_immediate,
             PRN: self.print,
+            MUL: self.multiply
         }
 
     def run(self, command, cpu):
@@ -25,3 +26,9 @@ class Dispatch():
     def print(self, cpu):
         print(cpu.register[cpu.ram_read(cpu.pc + 1)])
         cpu.pc += 1
+
+    def multiply(self, cpu):
+        val1 = cpu.ram_read(cpu.pc + 1)
+        val2 = cpu.ram_read(cpu.pc + 2)
+        cpu.pc += 2
+        print(cpu.register[val1] * cpu.register[val2])
