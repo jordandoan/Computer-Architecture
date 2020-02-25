@@ -14,6 +14,7 @@ class CPU:
         self.register[-1] = 0xF4
         self.pc = 0
         self.dispatch = Dispatch()
+        self.sc = 0xF3
 
     def ram_read(self, memory):
         return self.ram[memory]
@@ -61,13 +62,14 @@ class CPU:
         ), end='')
 
         for i in range(8):
-            print(" %02X" % self.reg[i], end='')
+            print(" %02X" % self.register[i], end='')
         print()
 
     def run(self):
         """Run the CPU."""
         while True:
             command = self.ram_read(self.pc)
+            # self.trace()
             halt = self.dispatch.run(command, self)
             if halt:
                 break
