@@ -34,7 +34,8 @@ class Dispatch():
             self.run(cpu.ram_read(cpu.pc), cpu)
             cpu.pc += 1
         top = cpu.ram_read(cpu.sc + 1)
-        cpu.sc -= 1
+        cpu.ram_write(cpu.sc + 1, 0)
+        cpu.sc += 1
         cpu.pc = top + 1
 
     def load_immediate(self, cpu):
