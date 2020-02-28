@@ -28,12 +28,14 @@ class Dispatch():
 
     def call(self, cpu):
         RET = 0b00010001
-        prev = cpu.pc
-        cpu.pc = cpu.register[cpu.ram_read(cpu.pc+1)]
+        self.push(cpu, cpu.pc)
+        cpu.pc = cpu.register[cpu.ram_read(cpu.pc)]
         while cpu.ram_read(cpu.pc) != RET:
             self.run(cpu.ram_read(cpu.pc), cpu)
             cpu.pc += 1
-        cpu.pc = prev + 1
+        top = cpu.ram_read(cpu.sc + 1)
+        cpu.sc -= 1
+        cpu.pc = top + 1
 
     def load_immediate(self, cpu):
         reg_id = cpu.ram_read(cpu.pc + 1)
@@ -50,15 +52,17 @@ class Dispatch():
         val2 = cpu.ram_read(cpu.pc + 2)
         cpu.pc += 2
         cpu.register[val1] += cpu.register[val2]
+
     def multiply(self, cpu):
         val1 = cpu.ram_read(cpu.pc + 1)
         val2 = cpu.ram_read(cpu.pc + 2)
         cpu.pc += 2
         print(cpu.register[val1] * cpu.register[val2])
 
-    def push(self, cpu):
-        register = cpu.ram_read(cpu.pc + 1)
-        val = cpu.register[register]
+    def push(self, cpu, val=None):
+        if not val:
+            register = cpu.ram_read(cpu.pc + 1)
+            val = cpu.register[register]
         cpu.ram_write(cpu.sc, val)
         cpu.sc -= 1
         cpu.pc += 1
